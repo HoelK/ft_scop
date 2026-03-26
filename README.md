@@ -2,11 +2,25 @@
 
 ft_scop is a small graphical project with the goal of parsing a Wavefront .obj file and show it on screen using a graphics API
 
-The parser part will be made in Golang and the rendering in Rust using OpenGL or Vulkan
-The parser and rendering will be 2 different processes communicating by using Unix sockets
+The parser part will be made in Golang and the rendering in Rust using OpenGL or Vulkan<br>
+The parser and rendering will be 2 different processes communicating by using Unix sockets<br>
 
-The main goal of this project is just to learn the basic of Go, Rust and Graphics programming
+## Objective
+Parse a Wavefront .obj file with mtl file
+Show the object in 3D on screen
+
+## Goals
+- Learn basic of Go and Rust<br>
+- Learn basic of Graphics programming<br>
 
 # Setup
 
-Type make at the root of the repository then launch the parser with ./parser <file>
+Compile
+```bash
+make
+```
+
+Use
+```bash
+./parser <file>
+```
