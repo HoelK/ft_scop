@@ -1,7 +1,8 @@
 GO=go
-PARSER_SRCS=srcs/parser.go srcs/file.go
+PARSER_SRCS=srcs/parser.go \
+			srcs/file.go \
+			srcs/cmds.go
 NAME=parser
-
 
 all:
 	go build $(PARSER_SRCS)
