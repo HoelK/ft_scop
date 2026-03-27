@@ -1,14 +1,38 @@
 GO=go
-PARSER_SRCS=srcs/parser.go \
-			srcs/file.go \
-			srcs/cmds.go
-NAME=parser
+FLAGS=-buildmode=c-archive
+NAME=scop
 
-all:
-	go build $(PARSER_SRCS)
+#main
+MAIN_SRC=./src/main.rs
+
+#parser
+PARSER_SRCS=./src/bridge/bridge.go
+
+#libraries
+LIB_DIR=lib
+PARSER_LIB=libparser.a
+LIBS=$(LIB_DIR)/libparser.a
+
+#headers
+HEADER_DIR=header
+HEADERS=$(HEADER_DIR)/libparser.h
+
+all: $(PARSER_LIB)
+	#cd src && cargo build && cd ..
+
+$(PARSER_LIB): $(PARSER_SRCS)
+	mkdir -p lib
+	mkdir -p header
+	go build $(FLAGS) -o libparser.a $(PARSER_SRCS)
+	mv libparser.h ./header/.
+	mv libparser.a ./lib/.
 
 run:
-	go run $(PARSER_SRCS)
+	go run ./src/
 
 clean:
-	rm -f $(NAME)
+	rm -f $(NAME) $(LIBS) $(HEADERS)
+	rm -f main
+
+fclean: clean
+	go clean -cache

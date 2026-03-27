@@ -1,3 +1,7 @@
 test.txt
 todo.txt
-parser
+lib
+header
+libparser.so
+libparser.h
+srcs/target

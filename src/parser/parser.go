@@ -1,25 +1,24 @@
-package main
+package parser
 
-import "strings"
 import "fmt"
-import "os"
-import "log"
+//import "os"
+//import "log"
+import "strings"
 
 const (
 	CONTINUE = 1
 	BREAK = 2
 )
 
-var cmds = map[string]func([]string) (any, error) {
-	"mtllib" :	func(args []string) (any, error) { return mlib(args) },
-	"o":		func(args []string) (any, error) { return o(args) },
-	"v":		func(args []string) (any, error) { return v(args) },
-	"f":		func(args []string) (any, error) { return f(args) },
+var cmds = map[string]func([]string) error {
+	"mtllib" :	func(args []string) error { return mlib(args) },
+	"o":		func(args []string) error { return o(args) },
+	"v":		func(args []string) error { return v(args) },
+	"f":		func(args []string) error { return f(args) },
 }
 
 func checkLine(line string) ([]string, int8) {
 	tokenized := strings.Fields(line)
-	//fmt.Println(tokenized)
 
 	if (len(tokenized)) <= 0 {
 		fmt.Println("[INFO] Empty line")
@@ -41,16 +40,21 @@ func parseObj(file *FILE) {
 
 		if (instr == CONTINUE) { continue } else if (instr == BREAK) { break }
 		fn := cmds[tokenized[0]]
-		if (fn != nil) { fn(tokenized) } else { fmt.Println("[WARNING][", tokenized[0], "] Unsupported command") }
+		if (fn == nil) {
+			fmt.Println("[WARNING][", tokenized[0], "] Unsupported command")
+			continue
+		}
+		err := fn(tokenized)
+		if (err != nil) { fmt.Println("[ERROR]", err) }
 		if (eof) { break }
 	}
 }
 
-func main() {
+/*func main() {
 	if len(os.Args) != 2 { log.Fatal("File required has argument") }
 
 	var file FILE
 	file.init(os.Args[1])
 	defer file.fd.Close()
 	parseObj(&file)
-}
+}*/
