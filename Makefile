@@ -18,7 +18,7 @@ HEADER_DIR=header
 HEADERS=$(HEADER_DIR)/libparser.h
 
 all: $(PARSER_LIB)
-	#cd src && cargo build && cd ..
+	cd src && cargo build && cd ..
 
 $(PARSER_LIB): $(PARSER_SRCS)
 	mkdir -p lib
@@ -27,8 +27,11 @@ $(PARSER_LIB): $(PARSER_SRCS)
 	mv libparser.h ./header/.
 	mv libparser.a ./lib/.
 
+test:
+	go build ./src/bridge
+
 run:
-	go run ./src/
+	go run ./src/bridge
 
 clean:
 	rm -f $(NAME) $(LIBS) $(HEADERS)
