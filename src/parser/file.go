@@ -6,20 +6,20 @@ import "log"
 import "bufio"
 
 type FILE struct {
-	path	string
-	fd		*os.File
-	reader	*bufio.Reader
+	Path	string
+	Fd		*os.File
+	Reader	*bufio.Reader
 }
 
-func (this *FILE) init(path string) {
+func (this *FILE) Init(path string) {
 	var err error
-	this.fd, err = os.Open(os.Args[1])
+	this.Fd, err = os.Open(os.Args[1])
 	if (err != nil) { log.Fatal(err) }
-	this.reader = bufio.NewReader(this.fd)
+	this.Reader = bufio.NewReader(this.Fd)
 }
 
 func (this *FILE) getNextLine() (string, bool) {
-	line, err := this.reader.ReadString('\n')
+	line, err := this.Reader.ReadString('\n')
 	if (err == io.EOF) { return string(line), true }
 	if (err != nil) { log.Fatal(err) }
 

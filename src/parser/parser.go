@@ -1,8 +1,6 @@
 package parser
 
 import "fmt"
-//import "os"
-//import "log"
 import "strings"
 
 const (
@@ -10,11 +8,11 @@ const (
 	BREAK = 2
 )
 
-var cmds = map[string]func([]string) error {
-	"mtllib" :	func(args []string) error { return mlib(args) },
-	"o":		func(args []string) error { return o(args) },
-	"v":		func(args []string) error { return v(args) },
-	"f":		func(args []string) error { return f(args) },
+var cmds = map[string]func(*Data, []string) error {
+	"mtllib" :	func(data *Data, args []string) error { return mlib(data, args) },
+	"o":		func(data *Data, args []string) error { return o(data, args) },
+	"v":		func(data *Data, args []string) error { return v(data, args) },
+	"f":		func(data *Data, args []string) error { return f(data, args) },
 }
 
 func checkLine(line string) ([]string, int8) {
@@ -25,15 +23,19 @@ func checkLine(line string) ([]string, int8) {
 		return tokenized, BREAK
 	}
 	if (tokenized[0] == "#") { return tokenized, CONTINUE }
-	//if (len(tokenized) != 4) {
-	//	if (len(tokenized)) > 4 { fmt.Println("Too much arguments on line") 
-	//	} else { fmt.Println("Missing arguments on line") }
-	//	return tokenized, CONTINUE
-	//}
 	return tokenized, 0
 }
 
-func parseObj(file *FILE) {
+func printData(data *Data) {
+	fmt.Println("[LOG] Data info :")
+	for i := 0; i < len(data.Objs); i++ {
+		fmt.Println(data.Objs[i].Name)
+	}
+}
+
+func ParseObj(file *FILE) (Data) {
+	var data Data
+
 	for {
 		line, eof := file.getNextLine()
 		tokenized, instr := checkLine(line)
@@ -44,17 +46,10 @@ func parseObj(file *FILE) {
 			fmt.Println("[WARNING][", tokenized[0], "] Unsupported command")
 			continue
 		}
-		err := fn(tokenized)
-		if (err != nil) { fmt.Println("[ERROR]", err) }
-		if (eof) { break }
+		err := fn(&data, tokenized)
+		if (err != nil)	{ fmt.Println("[ERROR]", err) }
+		if (eof)		{ break }
 	}
+
+	return data
 }
-
-/*func main() {
-	if len(os.Args) != 2 { log.Fatal("File required has argument") }
-
-	var file FILE
-	file.init(os.Args[1])
-	defer file.fd.Close()
-	parseObj(&file)
-}*/

@@ -7,7 +7,7 @@ type Vertex struct {
 }
 
 type Face struct {
-	Vids	[]int32
+	Vids	[]int64
 }
 
 type Material struct {
@@ -22,6 +22,7 @@ type Material struct {
 }
 
 type Object struct {
+	Name	string
 	Vtxs	[]Vertex
 	Fcs		[]Face
 	Mtls	[]Material
