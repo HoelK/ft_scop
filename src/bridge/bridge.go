@@ -183,17 +183,25 @@ func redoFile(data *parser.Data) {
 	}
 }
 
-func main() {
+//export parse
+func parse(cpath *C.char) {
 	var file parser.FILE
 	var data parser.Data
 
-	if len(os.Args) != 2 { log.Fatal("File required has argument") }
+	var path string = C.GoString(cpath)
+	if (path == "") { log.Fatal("File required has argument") }
 
-	file.Init(os.Args[1])
+	file.Init(path)
 	defer file.Fd.Close()
 	data = parser.ParseObj(&file)
 	fmt.Println(data.Objs[0].Name)
 	cdata := translate(&data)
 	C.print_data(cdata)
 	// redoFile(&data)
+}
+
+func main() {
+	if len(os.Args) != 2 { log.Fatal("File required has argument") }
+
+	parse(C.CString(os.Args[1]))
 }
