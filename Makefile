@@ -18,7 +18,7 @@ HEADER_DIR=header
 HEADERS=$(HEADER_DIR)/libparser.h
 
 all: $(PARSER_LIB)
-	cd src && cargo build && cd ..
+	#cd src && cargo build && cd ..
 
 $(PARSER_LIB): $(PARSER_SRCS)
 	mkdir -p lib
