@@ -6,7 +6,7 @@ NAME=scop
 MAIN_SRC=./src/main.rs
 
 #parser
-PARSER_SRCS=./src/bridge/bridge.go
+PARSER_SRCS=./src/bridge/
 
 #libraries
 LIB_DIR=lib
@@ -24,8 +24,8 @@ $(PARSER_LIB): $(PARSER_SRCS)
 	mkdir -p lib
 	mkdir -p header
 	go build $(FLAGS) -o libparser.a $(PARSER_SRCS)
-	mv libparser.h ./header/.
 	mv libparser.a ./lib/.
+	mv libparser.h ./header/.
 
 test:
 	go build ./src/bridge
