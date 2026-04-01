@@ -8,8 +8,8 @@ var mtlCmds = map[string]func (*Material, []string) error {
 	"Kd"		:	func(mtl *Material, args []string) error { return Kd(mtl, args) },
 	"Ks"		:	func(mtl *Material, args []string) error { return Ks(mtl, args) },
 	"Ni"		:	func(mtl *Material, args []string) error { return Ni(mtl, args) },	
-	"d"			:	func(mtl *Material, args []string) error { return d(mtl, args) },
-	"illum"		:	func(mtl *Material, args []string) error { return illum(mtl, args) },
+	"d"			:	func(mtl *Material, args []string) error { return D(mtl, args) },
+	"illum"		:	func(mtl *Material, args []string) error { return Illum(mtl, args) },
 }
 
 func parseMtl(data *Data, name string) {
