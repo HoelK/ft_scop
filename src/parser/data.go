@@ -13,12 +13,17 @@ type Face struct {
 type Material struct {
 	Name	string
 	Ns		float64
-	Ka		float64		
-	Kd		float64
-	Ks		float64
+	Ka		[3]float64
+	Kd		[3]float64
+	Ks		[3]float64
 	Ni		float64
 	D		float64
-	Illum	int8
+	Illum	int64
+}
+
+type MtlFile struct {
+	Name	string
+	Mtls	[]Material
 }
 
 type Object struct {
@@ -29,5 +34,7 @@ type Object struct {
 }
 
 type Data struct {
+	Path string
 	Objs []Object
+	Mtls []Material
 }
