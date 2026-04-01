@@ -26,9 +26,9 @@ typedef struct s_material
 {
 	char	*name;
 	float	ns;
-	float	ka;
-	float	kd;
-	float	ks;
+	float	ka[3];
+	float	kd[3];
+	float	ks[3];
 	float	ni;
 	float	d;
 	int		illum;
@@ -106,9 +106,9 @@ func translateMaterials(mtls []parser.Material) (*C.t_material, C.uint) {
 		cmtl := C.get_material(cmtls, C.uint(i))
 		cmtl.name = C.CString(mtls[i].Name)
 		cmtl.ns = C.float(mtls[i].Ns)
-		cmtl.ka = C.float(mtls[i].Ka)
-		cmtl.kd = C.float(mtls[i].Kd)
-		cmtl.ks = C.float(mtls[i].Ks)
+		//cmtl.ka = C.float(mtls[i].Ka)
+		//cmtl.kd = C.float(mtls[i].Kd)
+		//cmtl.ks = C.float(mtls[i].Ks)
 		cmtl.ni = C.float(mtls[i].Ni)
 		cmtl.d = C.float(mtls[i].D)
 		cmtl.illum = C.int(mtls[i].Illum)
@@ -183,7 +183,6 @@ func redoFile(data *parser.Data) {
 	}
 }
 
-//export parse
 func parse(cpath *C.char) {
 	var file parser.FILE
 	var data parser.Data

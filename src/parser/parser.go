@@ -15,12 +15,16 @@ var cmds = map[string]func(*Data, []string) error {
 	"f":		func(data *Data, args []string) error { return f(data, args) },
 }
 
-func checkLine(line string) ([]string, int8) {
+func checkLine(line string, eof bool) ([]string, int8) {
 	tokenized := strings.Fields(line)
 
 	if (len(tokenized)) <= 0 {
+		if (eof) {
+			fmt.Println("[INFO] End Of File")
+			return tokenized, BREAK
+		}
 		fmt.Println("[INFO] Empty line")
-		return tokenized, BREAK
+		return tokenized, CONTINUE
 	}
 	if (tokenized[0] == "#") { return tokenized, CONTINUE }
 	return tokenized, 0
@@ -35,10 +39,11 @@ func printData(data *Data) {
 
 func ParseObj(file *FILE) (Data) {
 	var data Data
+	data.Path = file.Path
 
 	for {
 		line, eof := file.getNextLine()
-		tokenized, instr := checkLine(line)
+		tokenized, instr := checkLine(line, eof)
 
 		if (instr == CONTINUE) { continue } else if (instr == BREAK) { break }
 		fn := cmds[tokenized[0]]

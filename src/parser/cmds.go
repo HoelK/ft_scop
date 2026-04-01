@@ -6,6 +6,21 @@ import "strconv"
 
 func mlib(data *Data, args []string) error {
 	if (len(args) < 1) { return errors.New("[mtllib] Missing file name") }
+
+	for i := 1; i < len(args); i++ {
+		path := data.Path + args[i]
+		parseMtl(data, path)
+		var mat *Material
+		mat = &data.Mtls[len(data.Mtls) - 1]
+		fmt.Println("[Material]", mat.Name)
+		fmt.Println("[Ns]", mat.Ns)
+		fmt.Println("[Ka]", mat.Ka)
+		fmt.Println("[Kd]", mat.Kd)
+		fmt.Println("[Ks]", mat.Ks)
+		fmt.Println("[Ni]", mat.Ni)
+		fmt.Println("[D]", mat.D)
+		fmt.Println("[Illum]", mat.Illum)
+	}
 	return nil
 }
 
