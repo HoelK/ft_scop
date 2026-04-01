@@ -37,8 +37,8 @@ func o(data *Data, args []string) error {
 func v(data *Data, args []string) error {
 	var err		error
 	var vtx		Vertex
-	if (len(args) > 4) { return errors.New("[v] Too Much Parameters (3 required)") }
-	if (len(args) < 4) { return errors.New("[v] Missing Parameters (3 required)") }
+
+	err = checkArgs(args, 4)
 
 	if vtx.X, err = strconv.ParseFloat(args[1], 64); err != nil { return errors.New("[v] Failed Convertion : [\"" + args[1] + "\"] to [float64]") }
 	if vtx.Y, err = strconv.ParseFloat(args[2], 64); err != nil { return errors.New("[v] Failed Convertion : [\"" + args[2] + "\"] to [float64]") }
@@ -53,6 +53,7 @@ func f(data *Data, args []string) error {
 	var fc		Face
 	var err		error
 	var buf		int64
+
 	if (len(args) < 4) { return errors.New("[f] Missing parameters (at least 3 required)") }
 
 	for i := 0; i < (len(args) - 1); i++ {

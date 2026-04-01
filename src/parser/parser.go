@@ -1,7 +1,6 @@
 package parser
 
 import "fmt"
-import "strings"
 
 const (
 	CONTINUE = 1
@@ -13,21 +12,6 @@ var cmds = map[string]func(*Data, []string) error {
 	"o":		func(data *Data, args []string) error { return o(data, args) },
 	"v":		func(data *Data, args []string) error { return v(data, args) },
 	"f":		func(data *Data, args []string) error { return f(data, args) },
-}
-
-func checkLine(line string, eof bool) ([]string, int8) {
-	tokenized := strings.Fields(line)
-
-	if (len(tokenized)) <= 0 {
-		if (eof) {
-			fmt.Println("[INFO] End Of File")
-			return tokenized, BREAK
-		}
-		fmt.Println("[INFO] Empty line")
-		return tokenized, CONTINUE
-	}
-	if (tokenized[0] == "#") { return tokenized, CONTINUE }
-	return tokenized, 0
 }
 
 func printData(data *Data) {

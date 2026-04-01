@@ -3,12 +3,6 @@ package parser
 import "errors"
 import "strconv"
 
-func checkArgs(args []string, amount int) error {
-	if len(args) > amount { return errors.New("[" + args[0] + "] Too much arguments (" + string(amount) + " needed)") }
-	if len(args) < amount { return errors.New("[" + args[0] + "] Missing arguments (" + string(amount) + " needed)") }
-	return nil
-}
-
 func parseRGB(name string, args []string, rgb *[3]float64) (error) {
 	var err error
 
