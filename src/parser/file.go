@@ -4,16 +4,27 @@ import "io"
 import "os"
 import "log"
 import "bufio"
+import "strings"
 
 type FILE struct {
-	Path	string
-	Fd		*os.File
-	Reader	*bufio.Reader
+	Name		string
+	Path		string
+	Fullname	string
+	Fd			*os.File
+	Reader		*bufio.Reader
 }
 
 func (this *FILE) Init(path string) {
 	var err error
-	this.Fd, err = os.Open(os.Args[1])
+
+	this.Fullname = path
+	spl := strings.Split(path, "/")
+	this.Name = spl[len(spl) - 1]
+	spl = spl[:len(spl) - 1]
+	this.Path = strings.Join(spl, "/")
+	this.Path += "/"
+
+	this.Fd, err = os.Open(path)
 	if (err != nil) { log.Fatal(err) }
 	this.Reader = bufio.NewReader(this.Fd)
 }
