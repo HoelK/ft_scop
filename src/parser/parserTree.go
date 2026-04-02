@@ -24,6 +24,7 @@ func initTree() Node {
 	tmp.Branchs["v"] = &Node{"v", make(map[string]*Node), v}
 
 	tmp = tmp.Branchs["v"]
+	tmp.Branchs["v"] = tmp
 	tmp.Branchs["usemtl"] = &Node{"usemtl", make(map[string]*Node), nil}
 
 	tmp = tmp.Branchs["usemtl"]
@@ -33,6 +34,7 @@ func initTree() Node {
 	tmp.Branchs["f"] = &Node{"f", make(map[string]*Node), f}
 
 	tmp = tmp.Branchs["f"]
+	tmp.Branchs["f"] = tmp
 	tmp.Branchs["eof"]	= &Node{"eof", nil, nil}
 
 	return tree

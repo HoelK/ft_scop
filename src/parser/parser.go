@@ -7,13 +7,6 @@ const (
 	BREAK = 2
 )
 
-var cmds = map[string]func(*Data, []string) error {
-	"mtllib" :	func(data *Data, args []string) error { return mlib(data, args) },
-	"o":		func(data *Data, args []string) error { return o(data, args) },
-	"v":		func(data *Data, args []string) error { return v(data, args) },
-	"f":		func(data *Data, args []string) error { return f(data, args) },
-}
-
 func printData(data *Data) {
 	fmt.Println("[LOG] Data info :")
 	for i := 0; i < len(data.Objs); i++ {
@@ -21,23 +14,54 @@ func printData(data *Data) {
 	}
 }
 
+var cmdsSupported = map[string]bool {
+	"o" :		true,
+	"f" :		true,
+	"v" :		true,
+	"s" :		false,
+	"mtllib" :	true,
+	"usemtl" :	false,
+}
+
 func ParseObj(file *FILE) (Data) {
-	var data Data
+	var data	Data
+	var pTree	Node
+	var curr	*Node
+
+	pTree = initTree()
+	curr = &pTree
 	data.Path = file.Path
 
 	for {
 		line, eof := file.getNextLine()
 		tokenized, instr := checkLine(line, eof)
 
-		if (instr == CONTINUE) { continue } else if (instr == BREAK) { break }
-		fn := cmds[tokenized[0]]
-		if (fn == nil) {
+		if (instr == CONTINUE) { continue } else if (instr == BREAK) {
+			if (curr.Branchs["eof"] == nil) { fmt.Println("[ERROR][EOF] Unexpected - Incomplete object") }
+			break
+		}
+		_, ok := cmdsSupported[tokenized[0]]
+
+		if (!ok) {
+			fmt.Println("[ERROR][", tokenized[0], "] Undefined commmand")
+			continue
+		}
+		if (curr.Branchs[tokenized[0]] == nil) {
+			fmt.Println("[ERROR][", tokenized[0], "] Command in Wrong Section")
+			continue
+		}
+		curr = curr.Branchs[tokenized[0]]
+		if (curr.fn == nil) {
 			fmt.Println("[WARNING][", tokenized[0], "] Unsupported command")
 			continue
 		}
-		err := fn(&data, tokenized)
+
+		err	:= curr.fn(&data, tokenized)
 		if (err != nil)	{ fmt.Println("[ERROR]", err) }
-		if (eof)		{ break }
+		if (eof) {
+			if (curr.Branchs["eof"] == nil) { fmt.Println("[WARNING] EOF Unexpected, Incomplete object") }
+			break
+		}
 	}
 
 	return data
