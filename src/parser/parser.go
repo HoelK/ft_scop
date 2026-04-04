@@ -1,6 +1,7 @@
 package parser
 
 import "fmt"
+import "errors"
 
 const (
 	CONTINUE = 1
@@ -17,7 +18,7 @@ var cmdsSupported = map[string]bool {
 	"usemtl" :	true,
 }
 
-func ParseObj(file *FILE) (Data) {
+func ParseObj(file *FILE) (Data, error) {
 	var data	Data
 	var pTree	Node
 	var curr	*Node
@@ -31,7 +32,7 @@ func ParseObj(file *FILE) (Data) {
 		tokenized, instr := checkLine(line, eof)
 
 		if (instr == CONTINUE) { continue } else if (instr == BREAK) {
-			if (curr.Branchs["eof"] == nil) { fmt.Println("[ERROR][EOF] Unexpected - Incomplete object") }
+			if (curr.Branchs["eof"] == nil) { return data, errors.New("[ERROR][EOF] Unexpected - Incomplete object") }
 			break
 		}
 		_, ok := cmdsSupported[tokenized[0]]
@@ -53,10 +54,10 @@ func ParseObj(file *FILE) (Data) {
 		err	:= curr.fn(&data, tokenized)
 		if (err != nil)	{ fmt.Println("[ERROR]", err) }
 		if (eof) {
-			if (curr.Branchs["eof"] == nil) { fmt.Println("[WARNING][EOF] Unexpected - Incomplete object") }
+			if (curr.Branchs["eof"] == nil) { return data, errors.New("[ERROR][EOF] Unexpected - Incomplete object") }
 			break
 		}
 	}
 
-	return data
+	return data, nil
 }

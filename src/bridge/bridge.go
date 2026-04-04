@@ -89,10 +89,10 @@ void		print_data(t_data *data)
 
 */
 import "C"
-import "bridge/src/parser"
 import "os"
 import "log"
 import "fmt"
+import "bridge/src/parser"
 
 func translateVertexs(vtxs []parser.Vertex) (*C.t_vertex, C.uint) {
 	var v_count C.uint		= C.uint(len(vtxs))
@@ -111,6 +111,7 @@ func translateVertexs(vtxs []parser.Vertex) (*C.t_vertex, C.uint) {
 func translateMaterial(mtl *parser.Material) (C.t_material) {
 	var cmtl C.t_material
 
+	if (mtl == nil) { return cmtl }
 	cmtl.name = C.CString(mtl.Name)
 	for j := 0; j < 3; j++ {
 		cmtl.ka[j] = C.float(mtl.Ka[j])
@@ -164,7 +165,8 @@ func parse(cpath *C.char) (*C.t_data) {
 
 	file.Init(path)
 	defer file.Fd.Close()
-	data = parser.ParseObj(&file)
+	data, err := parser.ParseObj(&file)
+	if (err != nil) { log.Fatal(err) }
 	fmt.Println(data.Obj.Name)
 	cdata := translate(&data)
 	C.print_data(cdata)
