@@ -5,21 +5,14 @@ import "errors"
 import "strconv"
 
 func mlib(data *Data, args []string) error {
+	data.Mtls = make(map[string]*Material)
 	if (len(args) < 1) { return errors.New("[mtllib] Missing file name") }
 
 	for i := 1; i < len(args); i++ {
 		path := data.Path + args[i]
+		fmt.Println("[mtllib] Parsing ", path, "...")
 		parseMtl(data, path)
-		var mat *Material
-		mat = &data.Mtls[len(data.Mtls) - 1]
-		fmt.Println("[Material]", mat.Name)
-		fmt.Println("[Ns]", mat.Ns)
-		fmt.Println("[Ka]", mat.Ka)
-		fmt.Println("[Kd]", mat.Kd)
-		fmt.Println("[Ks]", mat.Ks)
-		fmt.Println("[Ni]", mat.Ni)
-		fmt.Println("[D]", mat.D)
-		fmt.Println("[Illum]", mat.Illum)
+		fmt.Println("[mtllib] Parsing finished !")
 	}
 	return nil
 }
@@ -67,5 +60,13 @@ func f(data *Data, args []string) error {
 
 	data.Objs[0].Fcs = append(data.Objs[0].Fcs, fc)
 	fmt.Println("[LOG][f] Face added")
+	return nil
+}
+
+func usemtl(data *Data, args []string) error {
+	if err := checkArgs(args, 2); err != nil { return err }
+
+	data.Objs[0].Mtl = data.Mtls[args[1]]
+	fmt.Println("[LOG][usemtl] Material added")
 	return nil
 }

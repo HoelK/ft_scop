@@ -39,10 +39,9 @@ typedef struct s_object
 	char		*name;
 	t_vertex	*vtxs;
 	t_face		*fcs;
-	t_material	*mtls;
+	t_material	mtl;
 	ui32		v_count;
 	ui32		f_count;
-	ui32		m_count;
 } t_object;
 
 typedef struct s_data
@@ -65,16 +64,32 @@ void		free_data(t_data *data)
 	{
 		free(data->objs[i].vtxs);
 		free(data->objs[i].fcs);
-		free(data->objs[i].mtls);
+		free(data->objs[i].mtl.name);
 	}
 }
 
 void		print_vertex(t_vertex vtx) { printf("v %f %f %f\n", vtx.x, vtx.y, vtx.z); }
+void		print_material(t_material mtl)
+{
+	printf("name %s\n", mtl.name);
+	printf("Ns %f\n", mtl.ns);
+	printf("Ka %f %f %f\n", mtl.ka[0], mtl.ka[1], mtl.ka[2]);
+	printf("Kd %f %f %f\n", mtl.kd[0], mtl.kd[1], mtl.kd[2]); 
+	printf("Ks %f %f %f\n", mtl.ks[0], mtl.ks[1], mtl.ks[2]);
+	printf("Ni %f\n", mtl.ni);
+	printf("d %f\n", mtl.d);
+	printf("illum %d\n", mtl.illum);
+}
+
 void		print_data(t_data *data)
 {
-	printf("o %s\n", data->objs[0].name);
-	for (ui32 i = 0; i < data->objs[0].v_count; i++)
-		print_vertex(data->objs[0].vtxs[i]);
+	for (ui32 i = 0; i < data->o_count; i++)
+	{
+		printf("o %s\n", data->objs[i].name);
+		for (ui32 y = 0; y < data->objs[i].v_count; y++)
+			print_vertex(data->objs[i].vtxs[y]);
+		print_material(data->objs[i].mtl);
+	}
 }
 
 */
@@ -98,23 +113,21 @@ func translateVertexs(vtxs []parser.Vertex) (*C.t_vertex, C.uint) {
 	return cvtxs, v_count
 }
 
-func translateMaterials(mtls []parser.Material) (*C.t_material, C.uint) {
-	var m_count C.uint		= C.uint(len(mtls))
-	var cmtls *C.t_material	= (*C.t_material)(C.malloc(C.sizeof_t_material * C.size_t(len(mtls))))
+func translateMaterial(mtl *parser.Material) (C.t_material) {
+	var cmtl C.t_material
 
-	for i := 0; i < len(mtls); i++ {
-		cmtl := C.get_material(cmtls, C.uint(i))
-		cmtl.name = C.CString(mtls[i].Name)
-		cmtl.ns = C.float(mtls[i].Ns)
-		//cmtl.ka = C.float(mtls[i].Ka)
-		//cmtl.kd = C.float(mtls[i].Kd)
-		//cmtl.ks = C.float(mtls[i].Ks)
-		cmtl.ni = C.float(mtls[i].Ni)
-		cmtl.d = C.float(mtls[i].D)
-		cmtl.illum = C.int(mtls[i].Illum)
+	cmtl.name = C.CString(mtl.Name)
+	for j := 0; j < 3; j++ {
+		cmtl.ka[j] = C.float(mtl.Ka[j])
+		cmtl.ks[j] = C.float(mtl.Ks[j])
+		cmtl.kd[j] = C.float(mtl.Kd[j])
 	}
+	cmtl.ns =	C.float(mtl.Ns)
+	cmtl.ni =	C.float(mtl.Ni)
+	cmtl.d =	C.float(mtl.D)
+	cmtl.illum = C.int(mtl.Illum)
 
-	return cmtls, m_count
+	return cmtl
 }
 
 func translateFaces(fcs []parser.Face, cvtxs *C.t_vertex) (*C.t_face, C.uint) {
@@ -122,12 +135,12 @@ func translateFaces(fcs []parser.Face, cvtxs *C.t_vertex) (*C.t_face, C.uint) {
 	var cfcs *C.t_face	= (*C.t_face)(C.malloc(C.sizeof_t_face * C.size_t(len(fcs))))
 
 	for i := 0; i < len(fcs); i++ {
-		cfc := C.get_face(cfcs, C.uint(i))
-		cfc.vtx = C.vtx_alloc(C.uint(len(fcs[i].Vids)))
+		cfc		:= C.get_face(cfcs, C.uint(i))
+		cfc.vtx	= C.vtx_alloc(C.uint(len(fcs[i].Vids)))
 
 		for y := 0; y < len(fcs[i].Vids); y++ {
-			vtx := C.get_vtx(cfc.vtx, C.uint(y))
-			*vtx = C.get_vertex(cvtxs, C.uint(fcs[i].Vids[y]))
+			vtx		:= C.get_vtx(cfc.vtx, C.uint(y))
+			*vtx	= C.get_vertex(cvtxs, C.uint(fcs[i].Vids[y]))
 		}
 	}
 
@@ -141,49 +154,17 @@ func translate(data *parser.Data) *C.t_data {
 	cdata.objs = (*C.t_object)(C.malloc(C.sizeof_t_object * C.size_t(len(data.Objs))))
 
 	for i := 0; i < len(data.Objs); i++ {
-		obj :=			C.get_obj(cdata.objs, C.uint(i))
-		obj.name = C.CString(data.Objs[i].Name)
+		obj :=		C.get_obj(cdata.objs, C.uint(i))
+		obj.name =	C.CString(data.Objs[i].Name)
 
 		obj.vtxs, obj.v_count	= translateVertexs(data.Objs[i].Vtxs)
 		obj.fcs, obj.f_count	= translateFaces(data.Objs[i].Fcs, obj.vtxs)
-		obj.mtls, obj.m_count	= translateMaterials(data.Objs[i].Mtls)
+		obj.mtl					= translateMaterial(data.Objs[i].Mtl)
 	}
 	return cdata
 }
 
-func wri(b []byte, file *os.File) {
-	nBytes, err := file.Write(b)
-	nBytes++
-	if (err != nil) { log.Fatal("Couldn't write in file") }
-}
-
-// test
-func redoFile(data *parser.Data) {
-	path := "redo.txt"
-	file, err := os.Create(path)
-	if (err != nil) { log.Fatal("Couldn't create " + path) }
-
-	toWr := []byte("o " + data.Objs[0].Name + "\n")
-	wri(toWr, file)
-	for i := 0; i < len(data.Objs[0].Vtxs); i++ {
-		toWr = []byte("v " + fmt.Sprintf("%f", data.Objs[0].Vtxs[i].X) + " " + fmt.Sprintf("%f", data.Objs[0].Vtxs[i].Y) + " " + fmt.Sprintf("%f", data.Objs[0].Vtxs[i].Z) + "\n")
-		wri(toWr, file)
-	}
-	toWr = []byte("usemtl Material\ns off\n")
-	wri(toWr, file)
-	for i := 0; i < len(data.Objs[0].Fcs); i++ {
-		toWr = []byte("f")
-		wri(toWr, file)
-		for y := 0; y < len(data.Objs[0].Fcs[i].Vids); y++ {
-			toWr = []byte(" " + fmt.Sprintf("%d", data.Objs[0].Fcs[i].Vids[y]))
-			wri(toWr, file)
-		}
-		toWr = []byte("\n")
-		wri(toWr, file)
-	}
-}
-
-func parse(cpath *C.char) {
+func parse(cpath *C.char) (*C.t_data) {
 	var file parser.FILE
 	var data parser.Data
 
@@ -197,6 +178,7 @@ func parse(cpath *C.char) {
 	cdata := translate(&data)
 	C.print_data(cdata)
 	// redoFile(&data)
+	return cdata
 }
 
 func main() {

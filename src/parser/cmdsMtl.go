@@ -36,13 +36,13 @@ func parseInt(name string, args []string, num *int64) error {
 }
 
 func newmtl(data *Data, args []string) (*Material, error) {
-	var mtl Material
+	var mtl *Material = new(Material)
 
 	if err := checkArgs(args, 2); err != nil { return nil, err }
 
 	mtl.Name = args[1]
-	data.Mtls = append(data.Mtls, mtl)
-	return &data.Mtls[len(data.Mtls) - 1], nil
+	data.Mtls[mtl.Name] = mtl
+	return data.Mtls[mtl.Name], nil
 }
 
 func Ns(mtl *Material, args []string)		error	{ return parseFloat(args[0], args, &mtl.Ns) }

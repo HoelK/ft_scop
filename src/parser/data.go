@@ -21,20 +21,15 @@ type Material struct {
 	Illum	int64
 }
 
-type MtlFile struct {
-	Name	string
-	Mtls	[]Material
-}
-
 type Object struct {
 	Name	string
 	Vtxs	[]Vertex
 	Fcs		[]Face
-	Mtls	[]Material
+	Mtl		*Material
 }
 
 type Data struct {
 	Path string
 	Objs []Object
-	Mtls []Material
+	Mtls map[string]*Material
 }

@@ -20,7 +20,7 @@ var cmdsSupported = map[string]bool {
 	"v" :		true,
 	"s" :		false,
 	"mtllib" :	true,
-	"usemtl" :	false,
+	"usemtl" :	true,
 }
 
 func ParseObj(file *FILE) (Data) {
