@@ -26,10 +26,11 @@ type Object struct {
 	Vtxs	[]Vertex
 	Fcs		[]Face
 	Mtl		*Material
+	S		bool
 }
 
 type Data struct {
-	Path string
-	Objs []Object
-	Mtls map[string]*Material
+	Path	string
+	Obj		Object
+	Mtls	map[string]*Material
 }

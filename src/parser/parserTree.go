@@ -28,7 +28,7 @@ func initTree() Node {
 	tmp.Branchs["usemtl"] = &Node{"usemtl", make(map[string]*Node), usemtl}
 
 	tmp = tmp.Branchs["usemtl"]
-	tmp.Branchs["s"] = &Node{"s", make(map[string]*Node), nil}
+	tmp.Branchs["s"] = &Node{"s", make(map[string]*Node), s}
 
 	tmp = tmp.Branchs["s"]
 	tmp.Branchs["f"] = &Node{"f", make(map[string]*Node), f}

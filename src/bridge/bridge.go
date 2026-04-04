@@ -3,9 +3,9 @@ package main
 /*
 #cgo CFLAGS: -Wall -Werror -Wextra
 
+#include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <stdio.h>
 
 typedef uint32_t ui32;
 
@@ -42,12 +42,12 @@ typedef struct s_object
 	t_material	mtl;
 	ui32		v_count;
 	ui32		f_count;
+	bool		smooth;
 } t_object;
 
 typedef struct s_data
 {
-	t_object	*objs;
-	ui32		o_count;
+	t_object	obj;
 } t_data;
 
 t_vertex	**vtx_alloc(ui32 size) { return (malloc(sizeof(t_vertex *) * size)); }
@@ -60,12 +60,9 @@ t_vertex	**get_vtx(t_vertex **lst, ui32 i)		{ return (&(lst[i])); }
 
 void		free_data(t_data *data)
 {
-	for (ui32 i = 0; i < data->o_count; i++)
-	{
-		free(data->objs[i].vtxs);
-		free(data->objs[i].fcs);
-		free(data->objs[i].mtl.name);
-	}
+	free(data->obj.vtxs);
+	free(data->obj.fcs);
+	free(data->obj.mtl.name);
 }
 
 void		print_vertex(t_vertex vtx) { printf("v %f %f %f\n", vtx.x, vtx.y, vtx.z); }
@@ -83,13 +80,11 @@ void		print_material(t_material mtl)
 
 void		print_data(t_data *data)
 {
-	for (ui32 i = 0; i < data->o_count; i++)
-	{
-		printf("o %s\n", data->objs[i].name);
-		for (ui32 y = 0; y < data->objs[i].v_count; y++)
-			print_vertex(data->objs[i].vtxs[y]);
-		print_material(data->objs[i].mtl);
-	}
+	printf("o %s\n", data->obj.name);
+	for (ui32 y = 0; y < data->obj.v_count; y++)
+	print_vertex(data->obj.vtxs[y]);
+	print_material(data->obj.mtl);
+	printf("s %d\n", data->obj.smooth);
 }
 
 */
@@ -135,12 +130,12 @@ func translateFaces(fcs []parser.Face, cvtxs *C.t_vertex) (*C.t_face, C.uint) {
 	var cfcs *C.t_face	= (*C.t_face)(C.malloc(C.sizeof_t_face * C.size_t(len(fcs))))
 
 	for i := 0; i < len(fcs); i++ {
-		cfc		:= C.get_face(cfcs, C.uint(i))
-		cfc.vtx	= C.vtx_alloc(C.uint(len(fcs[i].Vids)))
+		cfc		:=	C.get_face(cfcs, C.uint(i))
+		cfc.vtx	=	C.vtx_alloc(C.uint(len(fcs[i].Vids)))
 
 		for y := 0; y < len(fcs[i].Vids); y++ {
-			vtx		:= C.get_vtx(cfc.vtx, C.uint(y))
-			*vtx	= C.get_vertex(cvtxs, C.uint(fcs[i].Vids[y]))
+			vtx		:=	C.get_vtx(cfc.vtx, C.uint(y))
+			*vtx	=	C.get_vertex(cvtxs, C.uint(fcs[i].Vids[y]))
 		}
 	}
 
@@ -150,17 +145,13 @@ func translateFaces(fcs []parser.Face, cvtxs *C.t_vertex) (*C.t_face, C.uint) {
 func translate(data *parser.Data) *C.t_data {
 	cdata := (*C.t_data)(C.malloc(C.sizeof_t_data))
 
-	cdata.o_count = C.uint(len(data.Objs))
-	cdata.objs = (*C.t_object)(C.malloc(C.sizeof_t_object * C.size_t(len(data.Objs))))
+	obj := &cdata.obj
+	obj.name =	C.CString(data.Obj.Name)
 
-	for i := 0; i < len(data.Objs); i++ {
-		obj :=		C.get_obj(cdata.objs, C.uint(i))
-		obj.name =	C.CString(data.Objs[i].Name)
-
-		obj.vtxs, obj.v_count	= translateVertexs(data.Objs[i].Vtxs)
-		obj.fcs, obj.f_count	= translateFaces(data.Objs[i].Fcs, obj.vtxs)
-		obj.mtl					= translateMaterial(data.Objs[i].Mtl)
-	}
+	obj.vtxs, obj.v_count	= translateVertexs(data.Obj.Vtxs)
+	obj.fcs, obj.f_count	= translateFaces(data.Obj.Fcs, obj.vtxs)
+	obj.mtl					= translateMaterial(data.Obj.Mtl)
+	obj.smooth				= C.bool(data.Obj.S)
 	return cdata
 }
 
@@ -174,7 +165,7 @@ func parse(cpath *C.char) (*C.t_data) {
 	file.Init(path)
 	defer file.Fd.Close()
 	data = parser.ParseObj(&file)
-	fmt.Println(data.Objs[0].Name)
+	fmt.Println(data.Obj.Name)
 	cdata := translate(&data)
 	C.print_data(cdata)
 	// redoFile(&data)

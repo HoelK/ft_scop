@@ -7,18 +7,12 @@ const (
 	BREAK = 2
 )
 
-func printData(data *Data) {
-	fmt.Println("[LOG] Data info :")
-	for i := 0; i < len(data.Objs); i++ {
-		fmt.Println(data.Objs[i].Name)
-	}
-}
-
 var cmdsSupported = map[string]bool {
 	"o" :		true,
+	"g" :		false,
 	"f" :		true,
 	"v" :		true,
-	"s" :		false,
+	"s" :		true,
 	"mtllib" :	true,
 	"usemtl" :	true,
 }
@@ -59,7 +53,7 @@ func ParseObj(file *FILE) (Data) {
 		err	:= curr.fn(&data, tokenized)
 		if (err != nil)	{ fmt.Println("[ERROR]", err) }
 		if (eof) {
-			if (curr.Branchs["eof"] == nil) { fmt.Println("[WARNING] EOF Unexpected, Incomplete object") }
+			if (curr.Branchs["eof"] == nil) { fmt.Println("[WARNING][EOF] Unexpected - Incomplete object") }
 			break
 		}
 	}
