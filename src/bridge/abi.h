@@ -47,23 +47,23 @@ typedef struct s_data
 	t_object	obj;
 } t_data;
 
-t_vertex	**vtx_alloc(ui32 size) { return (malloc(sizeof(t_vertex *) * size)); }
+static inline t_vertex	**vtx_alloc(ui32 size) { return (malloc(sizeof(t_vertex *) * size)); }
 
-t_face		*get_face(t_face *lst, ui32 i)			{ return (&(lst[i])); }
-t_object	*get_obj(t_object *lst, ui32 i)			{ return (&(lst[i])); }
-t_vertex	*get_vertex(t_vertex *lst, ui32 i)		{ return (&(lst[i])); }
-t_material	*get_material(t_material *lst, ui32 i)	{ return (&(lst[i])); }
-t_vertex	**get_vtx(t_vertex **lst, ui32 i)		{ return (&(lst[i])); }
+static inline t_face		*get_face(t_face *lst, ui32 i)			{ return (&(lst[i])); }
+static inline t_object	*get_obj(t_object *lst, ui32 i)			{ return (&(lst[i])); }
+static inline t_vertex	*get_vertex(t_vertex *lst, ui32 i)		{ return (&(lst[i])); }
+static inline t_material	*get_material(t_material *lst, ui32 i)	{ return (&(lst[i])); }
+static inline t_vertex	**get_vtx(t_vertex **lst, ui32 i)		{ return (&(lst[i])); }
 
-void		free_data(t_data *data)
+static inline void		free_data(t_data *data)
 {
 	free(data->obj.vtxs);
 	free(data->obj.fcs);
 	free(data->obj.mtl.name);
 }
 
-void		print_vertex(t_vertex vtx) { printf("v %f %f %f\n", vtx.x, vtx.y, vtx.z); }
-void		print_material(t_material mtl)
+static inline void		print_vertex(t_vertex vtx) { printf("v %f %f %f\n", vtx.x, vtx.y, vtx.z); }
+static inline void		print_material(t_material mtl)
 {
 	printf("name %s\n", mtl.name);
 	printf("Ns %f\n", mtl.ns);
@@ -75,7 +75,7 @@ void		print_material(t_material mtl)
 	printf("illum %d\n", mtl.illum);
 }
 
-void		print_data(t_data *data)
+static inline void		print_data(t_data *data)
 {
 	printf("o %s\n", data->obj.name);
 	for (ui32 y = 0; y < data->obj.v_count; y++)

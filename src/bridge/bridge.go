@@ -81,7 +81,6 @@ func parse(cpath *C.char) (*C.t_data) {
 	defer file.Fd.Close()
 	data, err := parser.ParseObj(&file)
 	if (err != nil) { log.Fatal(err) }
-	fmt.Println(data.Obj.Name)
 	cdata := translate(&data)
 	return cdata
 }
